@@ -8,7 +8,7 @@ public class DBServer
 {
   public void initiateServer() throws IOException
   {
-    ServerSocket serverSocket = new ServerSocket(1237);
+    ServerSocket serverSocket = new ServerSocket(1235);
 
     while (true)
     {
@@ -16,7 +16,6 @@ public class DBServer
         System.out.println("Waiting for client to connect.");
         Socket socket = serverSocket.accept();
         DBSocketHandler  dbSocketHandler = new DBSocketHandler(socket);
-
         Thread thread = new Thread(dbSocketHandler);
         thread.setDaemon(true);
         thread.start();

@@ -5,18 +5,29 @@ import java.io.Serializable;
 
 public class User implements Serializable
 {
-  private String username;
+  private String userid;
   private String password;
-  private String level;
+  private String role;
 
-  public String getUsername()
+  public User()
   {
-    return username;
   }
 
-  public void setUsername(String username)
+  public User(String userid, String password, String role)
   {
-    this.username = username;
+    this.userid = userid;
+    this.password = password;
+    this.role = role;
+  }
+
+  public String getUserid()
+  {
+    return userid;
+  }
+
+  public void setUserid(String userid)
+  {
+    this.userid = userid;
   }
 
   public String getPassword()
@@ -29,19 +40,19 @@ public class User implements Serializable
     this.password = password;
   }
 
-  public String getLevel()
+  public String getRole()
   {
-    return level;
+    return role;
   }
 
-  public void setLevel(String level)
+  public void setRole(String role)
   {
-    this.level = level;
+    this.role = role;
   }
 
   @Override public String toString()
   {
-    return "User{" + "username='" + username + '\'' + ", password='" + password
-        + '\'' + ", level='" + level + '\'' + '}';
+    return "User{" + "userid='" + userid + '\'' + ", password='" + password
+        + '\'' + ", role='" + role + '\'' + '}';
   }
 }

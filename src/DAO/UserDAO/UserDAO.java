@@ -1,80 +1,63 @@
 package DAO.UserDAO;
 
 import Models.User;
+import Networking.DBConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO implements IUserDAO
 {
-  public Connection getDBConnection()
+  private DBConnection dbConnection = new DBConnection();
+
+  @Override public List<User> getAllUsers()
   {
     Connection connection = null;
-    Statement statement = null;
-    try{
-      return connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres?currentSchema=SEP3\", admin, 7637");
-    }
-    catch (SQLException e){
-      e.printStackTrace();
-    }
-    return null;
-  }
-  @Override public void createUser(User user)
-  {
-    Connection connection = getDBConnection();
-
+    List<User> userList = new ArrayList<>();
     try
     {
-      String query = "Insert into Users (username, password, role) values (?,?,?)";
+      connection = dbConnection.getDBConnection();
+      String query = "select * from \"SEP3\".users where role != 'admin'";
       PreparedStatement statement = connection.prepareStatement(query);
-      statement.setString(1, user.getUsername());
-      statement.setString(2, user.getPassword());
-      statement.setString(3, user.getLevel());
-
-      statement.executeUpdate();
-    }
-    catch (SQLException e){
-      e.printStackTrace();
-    }
-  }
-
-  @Override public void deleteUser(String username)
-  {
-
-  }
-
-  @Override public void updateUser(User user)
-  {
-
-  }
-
-  @Override public ArrayList<User> getUserList(String username)
-  {
-    return null;
-  }
-
-  @Override public User getSpecificUserLogin(String username, String password)
-  {
-    Connection connection = getDBConnection();
-    User user = new User();
-
-    try {
-      String query = "select * from users where username = ? and password = ?";
-      PreparedStatement statement = connection.prepareStatement(query);
-      statement.setString(1,username);
-      statement.setString(2, password);
 
       ResultSet resultSet = statement.executeQuery();
 
-      if (resultSet.next()) {
-        user.setUsername(resultSet.getString(1));
-        user.setPassword(resultSet.getString(2));
-        user.setLevel(resultSet.getString(3));
+      while (resultSet.next())
+      {
+        User user1 = new User();
+        user1.setUserid(resultSet.getString(1));
+        user1.setPassword(resultSet.getString(2));
+        user1.setRole(resultSet.getString(3));
+        userList.add(user1);
+        System.out.println(user1);
       }
-    } catch (SQLException e) {
+    }
+    catch (SQLException e)
+    {
       e.printStackTrace();
     }
+    return userList;
+  }
 
-    return user;
+  @Override public boolean deleteUser(String userid)
+  {
+    Connection connection = null;
+    try
+    {
+      connection = dbConnection.getDBConnection();
+      String query = "DELETE FROM \"SEP3\".users WHERE userid = ?";
+      PreparedStatement statement = connection.prepareStatement(query);
+      statement.setString(1, userid);
+
+      statement.executeQuery();
+      return true;
+    }
+    catch (SQLException e)
+    {
+      e.printStackTrace();
+    }
+    return false;
+
   }
 }

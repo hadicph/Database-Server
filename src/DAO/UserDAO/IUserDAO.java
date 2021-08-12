@@ -3,12 +3,10 @@ package DAO.UserDAO;
 import Models.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface IUserDAO
 {
-  void createUser(User user);
-  void deleteUser(String username);
-  void updateUser(User user);
-  ArrayList<User> getUserList(String username);
-  User getSpecificUserLogin(String username,String password);
+  List<User> getAllUsers();
+  boolean deleteUser(String userid);
 }

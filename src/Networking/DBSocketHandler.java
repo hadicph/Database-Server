@@ -1,17 +1,18 @@
 package Networking;
 
-
+import DAO.LoginDAO.ILoginDAO;
+import DAO.LoginDAO.LoginDAO;
 import DAO.UserDAO.IUserDAO;
+import DAO.UserDAO.UserDAO;
 import Models.User;
-import Util.Request;
+import Util.NetworkRequest;
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.net.Socket;
+import java.util.List;
 
 public class DBSocketHandler implements Runnable
 {
@@ -20,7 +21,8 @@ public class DBSocketHandler implements Runnable
   private InputStream inputStream;
   private Gson gson;
 
-  private IUserDAO userDAO;
+  private ILoginDAO loginDAO = new LoginDAO();
+  private IUserDAO userDAO = new UserDAO();
 
   public DBSocketHandler(Socket socket)
   {
@@ -41,30 +43,72 @@ public class DBSocketHandler implements Runnable
 
   @Override public void run()
   {
-    byte[] inputFromTier2 = new byte[1024*1024];
-    try {
+    byte[] inputFromTier2 = new byte[1024 * 1024];
+    try
+    {
 
-      int arrayLength = inputStream.read(inputFromTier2, 0, inputFromTier2.length);
+      int arrayLength = inputStream
+          .read(inputFromTier2, 0, inputFromTier2.length);
       String arrString = new String(inputFromTier2, 0, arrayLength);
-      Request request = gson.fromJson(arrString, Request.class);
+      NetworkRequest request = gson.fromJson(arrString, NetworkRequest.class);
 
-      switch (request.getEnumRequest())
+      switch (request.getType())
       {
-        case CreateUser:
+        case LOGIN:
         {
-          JsonReader jsonReader = new JsonReader(new StringReader(request.getUser().toString()));
-          jsonReader.setLenient(true);
-          User user = request.getUser();
-          userDAO.createUser(user);
-          break;
+          System.out.println(request.getData());
+          try
+          {
+            User user = gson.fromJson(request.getData(), User.class);
+
+            System.out.println(
+                "userid: " + user.getUserid() + " password: " + user
+                    .getPassword()); //TO BE REMOVED!!
+
+            User userResult = loginDAO.userLogin(user);
+            String jsonString = new Gson().toJson(userResult);
+            byte[] array = jsonString.getBytes();
+            outputStream.write(array, 0, array.length);
+            break;
+          }
+          catch (Exception e)
+          {
+            e.printStackTrace();
+          }
+
         }
-        case GetSpecificUserLogin:
+        case USERS:
         {
-          User user = userDAO.getSpecificUserLogin(request.getUsername(), request.getPassword());
-          String jsonString = new Gson().toJson(user);
-          byte[] array = jsonString.getBytes();
-          outputStream.write(array,0,array.length);
-          break;
+          System.out.println(request.getData());
+          try
+          {
+            List<User> userList = userDAO.getAllUsers();
+            String jsonString = new Gson().toJson(userList);
+            byte[] array = jsonString.getBytes();
+            outputStream.write(array, 0, array.length);
+            break;
+          }
+          catch (Exception e)
+          {
+            e.printStackTrace();
+          }
+        }
+        case DELETE_USER:
+        {
+          System.out.println("Deleting User: " + request.getData());
+          try
+          {
+            String userid = gson.fromJson(request.getData(), String.class);
+            boolean response = userDAO.deleteUser(userid);
+            String jsonString = new Gson().toJson(response);
+            byte[] array = jsonString.getBytes();
+            outputStream.write(array, 0, array.length);
+            break;
+          }
+          catch (Exception e)
+          {
+            e.printStackTrace();
+          }
         }
 
         /*case GetFromTier3:
@@ -93,10 +137,12 @@ public class DBSocketHandler implements Runnable
 
          */
 
-
       }
 
-    } catch (Exception e) {
+
+    }
+    catch(Exception e)
+    {
       e.printStackTrace();
     }
 
