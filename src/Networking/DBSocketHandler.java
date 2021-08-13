@@ -4,6 +4,7 @@ import DAO.LoginDAO.ILoginDAO;
 import DAO.LoginDAO.LoginDAO;
 import DAO.UserDAO.IUserDAO;
 import DAO.UserDAO.UserDAO;
+import Models.Case;
 import Models.User;
 import Util.NetworkRequest;
 import com.google.gson.Gson;
@@ -101,6 +102,55 @@ public class DBSocketHandler implements Runnable
             String userid = gson.fromJson(request.getData(), String.class);
             boolean response = userDAO.deleteUser(userid);
             String jsonString = new Gson().toJson(response);
+            byte[] array = jsonString.getBytes();
+            outputStream.write(array, 0, array.length);
+            break;
+          }
+          catch (Exception e)
+          {
+            e.printStackTrace();
+          }
+        }
+        case CASE:
+        {
+          try
+          {
+            String userid = gson.fromJson(request.getData(),String.class);
+            List<Case> caseList = userDAO.getCasesForSpecificUser(userid);
+            String jsonString = new Gson().toJson(caseList);
+            byte[] array = jsonString.getBytes();
+            outputStream.write(array, 0, array.length);
+            break;
+          }
+          catch (Exception e)
+          {
+            e.printStackTrace();
+          }
+        }
+        case ADD_USER:
+        {
+          System.out.println("Adding User: " + request.getData());
+          try
+          {
+            User user = gson.fromJson(request.getData(), User.class);
+            boolean response = userDAO.addUser(user);
+            String jsonString = new Gson().toJson(response);
+            byte[] array = jsonString.getBytes();
+            outputStream.write(array, 0, array.length);
+            break;
+          }
+          catch (Exception e)
+          {
+            e.printStackTrace();
+          }
+        }
+        case LOAD_DATA:
+        {
+          try
+          {
+            String userid = gson.fromJson(request.getData(),String.class);
+            User user = userDAO.loadData(userid);
+            String jsonString = new Gson().toJson(user);
             byte[] array = jsonString.getBytes();
             outputStream.write(array, 0, array.length);
             break;
