@@ -62,10 +62,6 @@ public class DBSocketHandler implements Runnable
           {
             User user = gson.fromJson(request.getData(), User.class);
 
-            System.out.println(
-                "userid: " + user.getUserid() + " password: " + user
-                    .getPassword()); //TO BE REMOVED!!
-
             User userResult = loginDAO.userLogin(user);
             String jsonString = new Gson().toJson(userResult);
             byte[] array = jsonString.getBytes();
@@ -160,36 +156,7 @@ public class DBSocketHandler implements Runnable
             e.printStackTrace();
           }
         }
-
-        /*case GetFromTier3:
-        {
-          dummy.setName("Chris");
-          dummy.setAge(26);
-          dummy.setSalary(6500.00);
-
-          String jsonString = new Gson().toJson(dummy);
-          byte[] array = jsonString.getBytes();
-          outputStream.write(array,0,array.length);
-          break;
-        }
-
-        case SendToTier3:
-        {
-          JsonReader reader = new JsonReader(new StringReader(request.getDummyObject().toString()));
-          reader.setLenient(true);
-
-          DummyObject dummy = request.getDummyObject();
-          //dummyDAO.createDummy(dummy); <-- Something like this to call a function in the DAO
-
-          System.out.println("Name: " + dummy.getName() + ", Age: " + dummy.getAge() + ", Salary: " + dummy.getSalary());
-          break;
-        }
-
-         */
-
       }
-
-
     }
     catch(Exception e)
     {

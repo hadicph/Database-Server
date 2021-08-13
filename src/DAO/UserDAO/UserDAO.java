@@ -31,7 +31,6 @@ public class UserDAO implements IUserDAO
         user1.setPassword(resultSet.getString(2));
         user1.setRole(resultSet.getString(3));
         userList.add(user1);
-        System.out.println(user1);
       }
     }
     catch (SQLException e)
@@ -82,7 +81,6 @@ public class UserDAO implements IUserDAO
         case1.setUserid(resultSet.getString(2));
         case1.setCasedata(resultSet.getString(3));
         caseList.add(case1);
-        System.out.println(case1);
       }
     }
     catch (SQLException e)
